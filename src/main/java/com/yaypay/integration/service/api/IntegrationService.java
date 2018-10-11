@@ -11,6 +11,7 @@ import com.yaypay.api.dto.customer.CustomerResponse;
 import com.yaypay.api.dto.external_company.ExternalCompanyRequest;
 import com.yaypay.api.dto.external_contact.ExternalContactRequest;
 import com.yaypay.api.dto.invoice.InvoiceRequest;
+import com.yaypay.api.dto.log.LoggingMessage;
 import com.yaypay.api.dto.log.SyncEntity;
 import com.yaypay.api.dto.payment.PaymentRequest;
 import com.yaypay.api.dto.sales.SalesRequest;
@@ -87,4 +88,6 @@ public interface IntegrationService {
     Set<String> deleteEntity(SyncEntity syncEntityType, List<DeleteEntity> deleteEntities, Long transactionId, String apiKey) throws ExecutionException, InterruptedException;
 
     List<String> getActiveEntityIds(SyncEntity syncEntityType, Integer bizId, String apiKey, String sourceSystemType);
+
+    void sendLoggingMessage(String apiKey, LoggingMessage loggingMessage);
 }

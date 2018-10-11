@@ -14,6 +14,7 @@ import com.yaypay.api.dto.customer.CustomerResponse;
 import com.yaypay.api.dto.external_company.ExternalCompanyRequest;
 import com.yaypay.api.dto.external_contact.ExternalContactRequest;
 import com.yaypay.api.dto.invoice.InvoiceRequest;
+import com.yaypay.api.dto.log.LoggingMessage;
 import com.yaypay.api.dto.log.SyncEntity;
 import com.yaypay.api.dto.payment.PaymentRequest;
 import com.yaypay.api.dto.sales.SalesRequest;
@@ -67,6 +68,8 @@ public class ApiServiceTest {
     private ArgumentCaptor<EntityListRequest> entityListRequestCaptor;
     @Captor
     private ArgumentCaptor<DeleteEntityRequest> deleteEntityRequestArgumentCaptor;
+    @Mock
+    private LoggingMessage loggingMessage;
 
     @Before
     public void setUp() throws Exception {
@@ -362,6 +365,14 @@ public class ApiServiceTest {
         List<String> activeEntityIds = apiService.getActiveEntityIds(SyncEntity.CM, BIZ_ID, API_KEY, SOURCE_SYSTEM_TYPE);
         assertEquals(expectedId, urlCaptor.getValue());
         assertEquals(activeEntityIds.get(0), SOME_ID);
+    }
+
+    @Test
+    public void testMessages(){
+        String expectedUrl = "http://localhost/messages";
+        apiService.sendLoggingMessage(API_KEY, loggingMessage);
+
+        verify(httpClient, times(1)).postForLocation(eq(expectedUrl), eq(loggingMessage), anyMap());
     }
 
     private Date getStartDate() {
