@@ -38,9 +38,11 @@ public class Invoice {
     private InvoiceDistributionChannel distributionChannel;
     private Integration contact;
     private String contactEmail;
+    private String salesRepresentative;
 
-    @java.beans.ConstructorProperties({"customer", "file", "invoiceDate", "dueDate", "status", "currency", "discount", "tax", "paid", "total", "exchangeRate", "notes", "invoiceNumber", "items", "customFields", "closeDate", "pdfUrl", "terms", "distributionChannel", "contact", "contactEmail"})
-    Invoice(Integration customer, Integration file, String invoiceDate, String dueDate, InvoicePaidStatus status, String currency, BigDecimal discount, BigDecimal tax, BigDecimal paid, BigDecimal total, BigDecimal exchangeRate, String notes, String invoiceNumber, List<InvoiceItem> items, Map<String, Object> customFields, String closeDate, String pdfUrl, String terms, InvoiceDistributionChannel distributionChannel, Integration contact, String contactEmail) {
+
+    @java.beans.ConstructorProperties({"customer", "file", "invoiceDate", "dueDate", "status", "currency", "discount", "tax", "paid", "total", "exchangeRate", "notes", "invoiceNumber", "items", "customFields", "closeDate", "pdfUrl", "terms", "distributionChannel", "contact", "contactEmail", "salesRepresentative"})
+    Invoice(Integration customer, Integration file, String invoiceDate, String dueDate, InvoicePaidStatus status, String currency, BigDecimal discount, BigDecimal tax, BigDecimal paid, BigDecimal total, BigDecimal exchangeRate, String notes, String invoiceNumber, List<InvoiceItem> items, Map<String, Object> customFields, String closeDate, String pdfUrl, String terms, InvoiceDistributionChannel distributionChannel, Integration contact, String contactEmail, String salesRepresentative) {
         this.customer = customer;
         this.file = file;
         this.invoiceDate = invoiceDate;
@@ -62,6 +64,7 @@ public class Invoice {
         this.distributionChannel = distributionChannel;
         this.contact = contact;
         this.contactEmail = contactEmail;
+        this.salesRepresentative = salesRepresentative;
     }
 
     public static InvoiceBuilder builder() {
@@ -150,6 +153,10 @@ public class Invoice {
 
     public String getContactEmail() {
         return this.contactEmail;
+    }
+
+    public String getSalesRepresentative() {
+        return salesRepresentative;
     }
 
     public Invoice setCustomer(Integration customer) {
@@ -279,6 +286,7 @@ public class Invoice {
         private InvoiceDistributionChannel distributionChannel;
         private Integration contact;
         private String contactEmail;
+        private String salesRepresentative;
 
         InvoiceBuilder() {
         }
@@ -388,12 +396,17 @@ public class Invoice {
             return this;
         }
 
+        public Invoice.InvoiceBuilder salesRepresentative(String salesRepresentative) {
+            this.salesRepresentative = salesRepresentative;
+            return this;
+        }
+
         public Invoice build() {
-            return new Invoice(customer, file, invoiceDate, dueDate, status, currency, discount, tax, paid, total, exchangeRate, notes, invoiceNumber, items, customFields, closeDate, pdfUrl, terms, distributionChannel, contact, contactEmail);
+            return new Invoice(customer, file, invoiceDate, dueDate, status, currency, discount, tax, paid, total, exchangeRate, notes, invoiceNumber, items, customFields, closeDate, pdfUrl, terms, distributionChannel, contact, contactEmail, salesRepresentative);
         }
 
         public String toString() {
-            return "Invoice.InvoiceBuilder(customer=" + this.customer + ", file=" + this.file + ", invoiceDate=" + this.invoiceDate + ", dueDate=" + this.dueDate + ", status=" + this.status + ", currency=" + this.currency + ", discount=" + this.discount + ", tax=" + this.tax + ", paid=" + this.paid + ", total=" + this.total + ", exchangeRate=" + this.exchangeRate + ", notes=" + this.notes + ", invoiceNumber=" + this.invoiceNumber + ", items=" + this.items + ", customFields=" + this.customFields + ", closeDate=" + this.closeDate + ", pdfUrl=" + this.pdfUrl + ", terms=" + this.terms + ", distributionChannel=" + this.distributionChannel + ", contact=" + this.contact + ", contactEmail=" + this.contactEmail + ")";
+            return "Invoice.InvoiceBuilder(customer=" + this.customer + ", file=" + this.file + ", invoiceDate=" + this.invoiceDate + ", dueDate=" + this.dueDate + ", status=" + this.status + ", currency=" + this.currency + ", discount=" + this.discount + ", tax=" + this.tax + ", paid=" + this.paid + ", total=" + this.total + ", exchangeRate=" + this.exchangeRate + ", notes=" + this.notes + ", invoiceNumber=" + this.invoiceNumber + ", items=" + this.items + ", customFields=" + this.customFields + ", closeDate=" + this.closeDate + ", pdfUrl=" + this.pdfUrl + ", terms=" + this.terms + ", distributionChannel=" + this.distributionChannel + ", contact=" + this.contact + ", contactEmail=" + this.contactEmail + ", salesRepresentative=" + salesRepresentative + ")";
         }
     }
 }
