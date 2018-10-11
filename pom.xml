@@ -7,7 +7,7 @@
 
     <artifactId>integration-rest-client</artifactId>
     <groupId>com.yaypay</groupId>
-    <version>1.20</version>
+    <version>1.21</version>
 
     <properties>
         <java.version>1.8</java.version>

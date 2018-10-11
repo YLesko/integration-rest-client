@@ -13,11 +13,11 @@ import com.yaypay.api.dto.customer.CustomerResponse;
 import com.yaypay.api.dto.external_company.ExternalCompanyRequest;
 import com.yaypay.api.dto.external_contact.ExternalContactRequest;
 import com.yaypay.api.dto.invoice.InvoiceRequest;
+import com.yaypay.api.dto.log.LoggingMessage;
 import com.yaypay.api.dto.log.SyncEntity;
 import com.yaypay.api.dto.payment.PaymentRequest;
 import com.yaypay.api.dto.sales.SalesRequest;
 import com.yaypay.api.dto.transaction.UploadTransactionDTO;
-import com.yaypay.exception.SyncEntityUnknownException;
 import com.yaypay.integration.service.httpclient.HttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +37,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
+import static com.yaypay.integration.util.UrlUtil.getUrlPrefx;
 import static com.yaypay.util.DateFormatUtil.dateToIso8601UtcString;
 import static java.util.concurrent.Executors.newFixedThreadPool;
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
@@ -464,31 +465,18 @@ public final class ApiService implements IntegrationService {
         return entities != null ? Arrays.asList(entities) : Collections.emptyList();
     }
 
+    @Override
+    public void sendLoggingMessage(String apiKey, LoggingMessage loggingMessage) {
+        String url = this.apiUrl + "/messages";
+        httpClient.postForLocation(url, loggingMessage, buildAuthenticationHeaders(apiKey));
+    }
+
     private String calculateUrlForSync(String url, Integer bizId) {
         String requestUrl = this.apiUrl + url;
         if (bizId != null) {
             requestUrl = requestUrl + "?bizId=" + bizId;
         }
         return requestUrl;
-    }
-
-    private String getUrlPrefx(SyncEntity syncEntityType) {
-        switch (syncEntityType) {
-            case CUSTOMERS:
-                return "customers";
-            case INVOICES:
-                return "invoices";
-            case PAYMENTS:
-                return "payments";
-            case CM:
-                return "credit-memo";
-            case ADJUSTMENTS:
-                return "adjustments";
-            case CONTACTS:
-                return "contacts";
-            default:
-                throw new SyncEntityUnknownException("Unknown SyncEntity enum type: " + syncEntityType.toString());
-        }
     }
 
     private Map<String, String> buildAuthenticationHeaders(String apiKey) {
