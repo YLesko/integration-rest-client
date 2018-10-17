@@ -466,8 +466,8 @@ public final class ApiService implements IntegrationService {
     }
 
     @Override
-    public void sendLoggingMessage(String apiKey, LoggingMessage loggingMessage) {
-        String url = this.apiUrl + "/messages";
+    public void sendLoggingMessage(String apiKey, Long transactionId, LoggingMessage loggingMessage) {
+        String url = this.apiUrl + "/messages?transaction_id=" + transactionId;
         httpClient.postForLocation(url, loggingMessage, buildAuthenticationHeaders(apiKey));
     }
 

@@ -369,8 +369,8 @@ public class ApiServiceTest {
 
     @Test
     public void testMessages(){
-        String expectedUrl = "http://localhost/messages";
-        apiService.sendLoggingMessage(API_KEY, loggingMessage);
+        String expectedUrl = "http://localhost/messages?transaction_id=" + TRANSACTION_ID;
+        apiService.sendLoggingMessage(API_KEY, TRANSACTION_ID, loggingMessage);
 
         verify(httpClient, times(1)).postForLocation(eq(expectedUrl), eq(loggingMessage), anyMap());
     }
