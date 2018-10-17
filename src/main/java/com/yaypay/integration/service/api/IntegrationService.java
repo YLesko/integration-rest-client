@@ -89,5 +89,5 @@ public interface IntegrationService {
 
     List<String> getActiveEntityIds(SyncEntity syncEntityType, Integer bizId, String apiKey, String sourceSystemType);
 
-    void sendLoggingMessage(String apiKey, LoggingMessage loggingMessage);
+    void sendLoggingMessage(String apiKey, Long transactionId, LoggingMessage loggingMessage);
 }
