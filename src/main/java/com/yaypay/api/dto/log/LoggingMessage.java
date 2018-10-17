@@ -23,37 +23,10 @@ import java.util.Map;
  * Date Created: 2018/10/10
  */
 public class LoggingMessage {
-    private long bizId;
     private String text;
     private LogLevel logLevel;
     private MessageType messageType;
-    private String sourceSystem;
-    private String transactionId;
     private Map<String, String> labels;
-
-    public long getBizId() {
-        return bizId;
-    }
-
-    public void setBizId(long bizId) {
-        this.bizId = bizId;
-    }
-
-    public String getSourceSystem() {
-        return sourceSystem;
-    }
-
-    public void setSourceSystem(String sourceSystem) {
-        this.sourceSystem = sourceSystem;
-    }
-
-    public String getTransactionId() {
-        return transactionId;
-    }
-
-    public void setTransactionId(String transactionId) {
-        this.transactionId = transactionId;
-    }
 
     public MessageType getMessageType() {
         return messageType;
