@@ -112,11 +112,26 @@ public final class ApiService implements IntegrationService {
         String[] invoices = httpClient.get(url, String[].class, buildAuthenticationHeaders(apiKey));
         return Arrays.asList(invoices);
     }
-    
+
+    @Override
     public List<String> getOpenInvoiceWithoutContentIds(Integer bizId, String apiKey) {
         String url = calculateUrlForSync("/invoices/open_without_content", bizId);
         String[] invoices = httpClient.get(url, String[].class, buildAuthenticationHeaders(apiKey));
         return Arrays.asList(invoices);
+    }
+
+    @Override
+    public List<String> getOpenAdjustmentsIds(Integer bizId, String apiKey) {
+        String url = calculateUrlForSync("/adjustments/open", bizId);
+        String[] adjustments = httpClient.get(url, String[].class, buildAuthenticationHeaders(apiKey));
+        return Arrays.asList(adjustments);
+    }
+
+    @Override
+    public List<String> getOpenPaymentsIds(Integer bizId, String apiKey) {
+        String url = calculateUrlForSync("/payments/open", bizId);
+        String[] payments = httpClient.get(url, String[].class, buildAuthenticationHeaders(apiKey));
+        return Arrays.asList(payments);
     }
 
     @Override
