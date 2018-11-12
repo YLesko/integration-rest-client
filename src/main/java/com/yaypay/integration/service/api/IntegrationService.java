@@ -41,6 +41,12 @@ public interface IntegrationService {
 
     List<String> getOpenInvoiceIds(Integer bizId, String apiKey);
 
+    List<String> getOpenInvoiceWithoutContentIds(Integer bizId, String apiKey);
+
+    List<String> getOpenAdjustmentsIds(Integer bizId, String apiKey);
+
+    List<String> getOpenPaymentsIds(Integer bizId, String apiKey);
+
     void createOrUpdateInvoices(Long transactionId, List<InvoiceRequest> invoiceRequests, String apiKey) throws InterruptedException, ExecutionException;
 
     void createOrUpdateContacts(Long transactionId, List<ContactRequest> contactRequests, String apiKey) throws InterruptedException, ExecutionException;
