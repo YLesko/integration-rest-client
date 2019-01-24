@@ -43,7 +43,7 @@ public interface IntegrationService {
 
     List<String> getOpenInvoiceWithoutContentIds(Integer bizId, String apiKey);
 
-    List<String> getGetInvoiceWithIncorrectPaidSum(Integer bizId, String apiKey);
+    List<String> getInvoiceWithIncorrectPaidSum(Integer bizId, String apiKey);
 
     List<String> getOpenAdjustmentsIds(Integer bizId, String apiKey);
 
