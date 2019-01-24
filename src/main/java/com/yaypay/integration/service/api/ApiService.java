@@ -121,6 +121,13 @@ public final class ApiService implements IntegrationService {
     }
 
     @Override
+    public List<String> getGetInvoiceWithIncorrectPaidSum(Integer bizId, String apiKey) {
+        String url = calculateUrlForSync("/invoices/open_with_incorrect_paid", bizId);
+        String[] invoices = httpClient.get(url, String[].class, buildAuthenticationHeaders(apiKey));
+        return Arrays.asList(invoices);
+    }
+
+    @Override
     public List<String> getOpenAdjustmentsIds(Integer bizId, String apiKey) {
         String url = calculateUrlForSync("/adjustments/open", bizId);
         String[] adjustments = httpClient.get(url, String[].class, buildAuthenticationHeaders(apiKey));
