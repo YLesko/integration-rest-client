@@ -21,7 +21,6 @@ import com.yaypay.api.dto.sales.SalesRequest;
 import com.yaypay.api.dto.transaction.UploadTransactionDTO;
 import com.yaypay.integration.service.httpclient.HttpClient;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -73,14 +72,14 @@ public class ApiServiceTest {
 
     @Before
     public void setUp() throws Exception {
+        System.setProperty("user.timezone", "UTC");
         this.apiService = new ApiService(API_URL, "", httpClient);
     }
 
-    @Ignore
     @Test
     public void startTransaction() {
         //FIXME dates of the test is dependant on local time
-        String expectedUrl = "http://localhost/batch/start?start_period=1970-01-01T00:00:00+00:00&end_period=2018-01-01T00:00:00+00:00&source_system=NET_SUITE&is_regular=false";
+        String expectedUrl = "http://localhost/batch/start?start_period=1969-12-31T22:00:00+00:00&end_period=2017-12-31T22:00:00+00:00&source_system=NET_SUITE&is_regular=false";
         when(httpClient.post(urlCaptor.capture(), eq(null), eq(UploadTransactionDTO.class), anyMap())).thenReturn(UploadTransactionDTO.builder().id(TRANSACTION_ID).build());
         Long transaction = apiService.startTransaction(API_KEY, getStartDate(), getEndDate(), SOURCE_SYSTEM_TYPE, true);
         assertEquals(TRANSACTION_ID, transaction);
@@ -369,7 +368,7 @@ public class ApiServiceTest {
     }
 
     @Test
-    public void testMessages(){
+    public void testMessages() {
         String expectedUrl = "http://localhost/messages?transaction_id=" + TRANSACTION_ID;
         apiService.sendLoggingMessage(API_KEY, TRANSACTION_ID, loggingMessage);
 
