@@ -1,5 +1,6 @@
 package com.yaypay.integration.service.api;
 
+import com.yaypay.api.dto.account.AccountRequest;
 import com.yaypay.api.dto.adjustment.AdjustmentRequest;
 import com.yaypay.api.dto.contact.ContactRequest;
 import com.yaypay.api.dto.content.ContentRequest;
@@ -318,6 +319,27 @@ public final class ApiService implements IntegrationService {
                 externalContactRequestEntityListRequest.setItems(currentPartition);
                 String url = this.apiUrl + "/external-contacts?transaction_id=" + transactionId;
                 httpClient.postForLocation(url, externalContactRequestEntityListRequest, buildAuthenticationHeaders(apiKey));
+                log.info(PROCESSED_CHUNK_FROM, chunkNumber, size);
+                return null;
+            };
+            tasks.add(task);
+        }
+        processAllTasks(tasks);
+    }
+
+    public void createOrUpdateAccounts(Long transactionId, List<AccountRequest> accountRequest, String apiKey) throws InterruptedException, ExecutionException {
+        List<List<AccountRequest>> lists = partition(accountRequest, CHUNK_SIZE);
+        int i = 0;
+        int size = lists.size();
+        log.info("Accounts chunks size: {}", size);
+        List<Callable<Void>> tasks = new ArrayList<>(size);
+        for (List<AccountRequest> currentPartition : lists) {
+            final int chunkNumber = ++i;
+            Callable<Void> task = () -> {
+                EntityListRequest<AccountRequest> accountRequestEntityListRequest = new EntityListRequest<>();
+                accountRequestEntityListRequest.setItems(currentPartition);
+                String url = this.apiUrl + "/accounts?transaction_id=" + transactionId;
+                httpClient.postForLocation(url, accountRequestEntityListRequest, buildAuthenticationHeaders(apiKey));
                 log.info(PROCESSED_CHUNK_FROM, chunkNumber, size);
                 return null;
             };
