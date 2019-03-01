@@ -18,12 +18,16 @@ public class Account {
     private String name;
     private String accountNumber;
     private String accountType;
+    private String currencyInternalId;
+    private String currencyName;
 
-    @java.beans.ConstructorProperties({"name", "accountNumber", "accountType"})
-    Account(String name, String accountNumber, String accountType) {
+    @java.beans.ConstructorProperties({"name", "accountNumber", "accountType", "currencyInternalId", "currencyName"})
+    Account(String name, String accountNumber, String accountType, String currencyInternalId, String currencyName) {
         this.name = name;
         this.accountNumber = accountNumber;
         this.accountType = accountType;
+        this.currencyInternalId = currencyInternalId;
+        this.currencyName = currencyName;
     }
 
     public static Account.AccountBuilder builder() {
@@ -42,10 +46,20 @@ public class Account {
         return accountType;
     }
 
+    public String getCurrencyInternalId() {
+        return currencyInternalId;
+    }
+
+    public String getCurrencyName() {
+        return currencyName;
+    }
+
     public static class AccountBuilder {
         private String name;
         private String accountNumber;
         private String accountType;
+        private String currencyInternalId;
+        private String currencyName;
 
         AccountBuilder() {
         }
@@ -60,17 +74,32 @@ public class Account {
             return this;
         }
 
+        public Account.AccountBuilder currencyInternalId(String currencyInternalId) {
+            this.currencyInternalId = currencyInternalId;
+            return this;
+        }
+
+        public Account.AccountBuilder currencyName(String currencyName) {
+            this.currencyName = currencyName;
+            return this;
+        }
+
         public Account.AccountBuilder accountType(String accountType) {
             this.accountType = accountType;
             return this;
         }
 
         public Account build() {
-            return new Account(name, accountNumber, accountType);
+            return new Account(name, accountNumber, accountType, currencyInternalId, currencyName);
         }
 
         public String toString() {
-            return "Account.AccountBuilder(name=" + this.name + ", accountNumber=" + this.accountNumber + ", accountType=" + this.accountType + ")";
+            return "Account.AccountBuilder(name=" + this.name
+                    + ", accountNumber=" + this.accountNumber
+                    + ", accountType=" + this.accountType
+                    + ", currencyInternalId=" + this.currencyInternalId
+                    + ", currencyName=" + this.currencyName
+                    + ")";
         }
     }
 }
