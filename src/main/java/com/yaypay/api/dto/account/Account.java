@@ -20,14 +20,16 @@ public class Account {
     private String accountType;
     private String currencyInternalId;
     private String currencyName;
+    private boolean isActive;
 
-    @java.beans.ConstructorProperties({"name", "accountNumber", "accountType", "currencyInternalId", "currencyName"})
-    Account(String name, String accountNumber, String accountType, String currencyInternalId, String currencyName) {
+    @java.beans.ConstructorProperties({"name", "accountNumber", "accountType", "currencyInternalId", "currencyName", "isActive"})
+    Account(String name, String accountNumber, String accountType, String currencyInternalId, String currencyName, boolean isActive) {
         this.name = name;
         this.accountNumber = accountNumber;
         this.accountType = accountType;
         this.currencyInternalId = currencyInternalId;
         this.currencyName = currencyName;
+        this.isActive = isActive;
     }
 
     public static Account.AccountBuilder builder() {
@@ -54,12 +56,17 @@ public class Account {
         return currencyName;
     }
 
+    public boolean isActive() {
+        return isActive;
+    }
+
     public static class AccountBuilder {
         private String name;
         private String accountNumber;
         private String accountType;
         private String currencyInternalId;
         private String currencyName;
+        private boolean isActive;
 
         AccountBuilder() {
         }
@@ -89,8 +96,13 @@ public class Account {
             return this;
         }
 
+        public Account.AccountBuilder isActive(boolean isActive) {
+            this.isActive = isActive;
+            return this;
+        }
+
         public Account build() {
-            return new Account(name, accountNumber, accountType, currencyInternalId, currencyName);
+            return new Account(name, accountNumber, accountType, currencyInternalId, currencyName, isActive);
         }
 
         public String toString() {
@@ -99,6 +111,7 @@ public class Account {
                     + ", accountType=" + this.accountType
                     + ", currencyInternalId=" + this.currencyInternalId
                     + ", currencyName=" + this.currencyName
+                    + ", isActive=" + this.isActive
                     + ")";
         }
     }
