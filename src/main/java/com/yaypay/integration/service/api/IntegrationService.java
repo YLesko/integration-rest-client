@@ -80,7 +80,7 @@ public interface IntegrationService {
 
     void createOrUpdateContent(Long transactionId, ContentRequest contentRequests, String apiKey);
 
-    void createOrUpdateAccounts(Long transactionId, List<AccountRequest> contentRequests, String apiKey);
+    void createOrUpdateAccounts(Long transactionId, List<AccountRequest> contentRequests, String apiKey) throws InterruptedException, ExecutionException;
 
     Collection<CustomerResponse> getCustomers(Integer bizId, String apiKey, String sourceSystemType, boolean withOpenBalancesOnly);
 
