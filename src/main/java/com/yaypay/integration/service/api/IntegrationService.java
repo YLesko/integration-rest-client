@@ -1,5 +1,6 @@
 package com.yaypay.integration.service.api;
 
+import com.yaypay.api.dto.account.AccountRequest;
 import com.yaypay.api.dto.adjustment.AdjustmentRequest;
 import com.yaypay.api.dto.contact.ContactRequest;
 import com.yaypay.api.dto.content.ContentRequest;
@@ -78,6 +79,8 @@ public interface IntegrationService {
     void createOrUpdateContents(Long transactionId, List<ContentRequest> contentRequests, String apiKey) throws InterruptedException, ExecutionException;
 
     void createOrUpdateContent(Long transactionId, ContentRequest contentRequests, String apiKey);
+
+    void createOrUpdateAccounts(Long transactionId, List<AccountRequest> contentRequests, String apiKey) throws InterruptedException, ExecutionException;
 
     Collection<CustomerResponse> getCustomers(Integer bizId, String apiKey, String sourceSystemType, boolean withOpenBalancesOnly);
 
