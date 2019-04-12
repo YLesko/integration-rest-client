@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import static org.apache.commons.collections4.MapUtils.isEmpty;
 import static org.apache.http.HttpHeaders.ACCEPT;
@@ -101,9 +102,10 @@ public class HttpClient {
 
     private <T> T makeCall(String url, Class<T> resultClass, HttpUriRequest request, Map<String, String> additionalHeaders) {
         fillHeaders(request, additionalHeaders);
-
-        CloseableHttpClient client = HttpClientBuilder.create().build();
-        try {
+        try (CloseableHttpClient client = HttpClientBuilder
+                .create()
+                .setMaxConnTotal(1)
+                .setConnectionTimeToLive(30, TimeUnit.MINUTES).build()) {
             HttpResponse response = client.execute(request);
             verifyStatus(url, response);
             return objectMapper.readValue(response.getEntity().getContent(), resultClass);
@@ -116,9 +118,10 @@ public class HttpClient {
 
     private void makeCallForLocation(String url, HttpUriRequest request, Map<String, String> additionalHeaders) {
         fillHeaders(request, additionalHeaders);
-
-        CloseableHttpClient client = HttpClientBuilder.create().build();
-        try {
+        try (CloseableHttpClient client = HttpClientBuilder
+                .create()
+                .setMaxConnTotal(1)
+                .setConnectionTimeToLive(30, TimeUnit.MINUTES).build()) {
             HttpResponse response = client.execute(request);
             verifyStatus(url, response);
         } catch (IOException e) {
