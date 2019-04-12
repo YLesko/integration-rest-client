@@ -35,11 +35,9 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
 
 import static com.yaypay.util.DateFormatUtil.dateToIso8601UtcString;
 import static java.util.concurrent.Executors.newFixedThreadPool;
-import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static org.apache.commons.collections4.ListUtils.partition;
 
 /*************************************************************************
@@ -118,21 +116,14 @@ public final class ApiService implements IntegrationService {
         int i = 0;
         int size = lists.size();
         log.info("Invoices chunks size: {}", size);
-        List<Callable<Void>> tasks = new ArrayList<>(size);
         for (List<InvoiceRequest> currentChunk : lists) {
             final int chunkNumber = ++i;
-            Callable<Void> task = () -> {
-                EntityListRequest<InvoiceRequest> customerRequestEntityListRequest = new EntityListRequest<>();
-                customerRequestEntityListRequest.setItems(currentChunk);
-                String url = this.apiUrl + "/invoices?transaction_id=" + transactionId;
-                httpClient.postForLocation(url, customerRequestEntityListRequest, buildAuthenticationHeaders(apiKey));
-                log.info(PROCESSED_CHUNK_FROM, chunkNumber, size);
-                return null;
-
-            };
-            tasks.add(task);
+            EntityListRequest<InvoiceRequest> customerRequestEntityListRequest = new EntityListRequest<>();
+            customerRequestEntityListRequest.setItems(currentChunk);
+            String url = this.apiUrl + "/invoices?transaction_id=" + transactionId;
+            httpClient.postForLocation(url, customerRequestEntityListRequest, buildAuthenticationHeaders(apiKey));
+            log.info(PROCESSED_CHUNK_FROM, chunkNumber, size);
         }
-        processAllTasks(tasks);
     }
 
     @Override
@@ -141,20 +132,14 @@ public final class ApiService implements IntegrationService {
         int i = 0;
         final int size = lists.size();
         log.info("Contact chunks size: {}", size);
-        List<Callable<Void>> tasks = new ArrayList<>(size);
         for (List<ContactRequest> currentChunk : lists) {
             final int chunkNumber = ++i;
-            Callable<Void> task = () -> {
-                EntityListRequest<ContactRequest> customerRequestEntityListRequest = new EntityListRequest<>();
-                customerRequestEntityListRequest.setItems(currentChunk);
-                String url = this.apiUrl + "/contacts?transaction_id=" + transactionId;
-                httpClient.postForLocation(url, customerRequestEntityListRequest, buildAuthenticationHeaders(apiKey));
-                log.info(PROCESSED_CHUNK_FROM, chunkNumber, size);
-                return null;
-            };
-            tasks.add(task);
+            EntityListRequest<ContactRequest> customerRequestEntityListRequest = new EntityListRequest<>();
+            customerRequestEntityListRequest.setItems(currentChunk);
+            String url = this.apiUrl + "/contacts?transaction_id=" + transactionId;
+            httpClient.postForLocation(url, customerRequestEntityListRequest, buildAuthenticationHeaders(apiKey));
+            log.info(PROCESSED_CHUNK_FROM, chunkNumber, size);
         }
-        processAllTasks(tasks);
     }
 
     @Override
@@ -167,17 +152,12 @@ public final class ApiService implements IntegrationService {
         List<Callable<Void>> tasks = new ArrayList<>(size);
         for (List<CustomerRequest> currentChunk : partition) {
             final int chunkNumber = ++i;
-            Callable<Void> task = () -> {
-                EntityListRequest<CustomerRequest> customerRequestEntityListRequest = new EntityListRequest<>();
-                customerRequestEntityListRequest.setItems(currentChunk);
-                String url = this.apiUrl + "/customers?transaction_id=" + transactionId;
-                httpClient.postForLocation(url, customerRequestEntityListRequest, buildAuthenticationHeaders(apiKey));
-                log.info(PROCESSED_CHUNK_FROM, chunkNumber, size);
-                return null;
-            };
-            tasks.add(task);
+            EntityListRequest<CustomerRequest> customerRequestEntityListRequest = new EntityListRequest<>();
+            customerRequestEntityListRequest.setItems(currentChunk);
+            String url = this.apiUrl + "/customers?transaction_id=" + transactionId;
+            httpClient.postForLocation(url, customerRequestEntityListRequest, buildAuthenticationHeaders(apiKey));
+            log.info(PROCESSED_CHUNK_FROM, chunkNumber, size);
         }
-        processAllTasks(tasks);
     }
 
     @Override
@@ -186,20 +166,14 @@ public final class ApiService implements IntegrationService {
         int i = 0;
         int size = lists.size();
         log.info("Payments chunks size: {}", size);
-        List<Callable<Void>> tasks = new ArrayList<>(size);
         for (List<PaymentRequest> currentPartition : lists) {
             final int chunkNumber = ++i;
-            Callable<Void> task = () -> {
-                EntityListRequest<PaymentRequest> customerRequestEntityListRequest = new EntityListRequest<>();
-                customerRequestEntityListRequest.setItems(currentPartition);
-                String url = this.apiUrl + "/payments?transaction_id=" + transactionId;
-                httpClient.postForLocation(url, customerRequestEntityListRequest, buildAuthenticationHeaders(apiKey));
-                log.info(PROCESSED_CHUNK_FROM, chunkNumber, size);
-                return null;
-            };
-            tasks.add(task);
+            EntityListRequest<PaymentRequest> customerRequestEntityListRequest = new EntityListRequest<>();
+            customerRequestEntityListRequest.setItems(currentPartition);
+            String url = this.apiUrl + "/payments?transaction_id=" + transactionId;
+            httpClient.postForLocation(url, customerRequestEntityListRequest, buildAuthenticationHeaders(apiKey));
+            log.info(PROCESSED_CHUNK_FROM, chunkNumber, size);
         }
-        processAllTasks(tasks);
     }
 
     @Override
@@ -208,20 +182,14 @@ public final class ApiService implements IntegrationService {
         int i = 0;
         int size = lists.size();
         log.info("Credit memo chunks size: {}", size);
-        List<Callable<Void>> tasks = new ArrayList<>(size);
         for (List<CreditMemoRequest> currentPartition : lists) {
             final int chunkNumber = ++i;
-            Callable<Void> task = () -> {
-                EntityListRequest<CreditMemoRequest> customerRequestEntityListRequest = new EntityListRequest<>();
-                customerRequestEntityListRequest.setItems(currentPartition);
-                String url = this.apiUrl + "/credit-memo?transaction_id=" + transactionId;
-                httpClient.postForLocation(url, customerRequestEntityListRequest, buildAuthenticationHeaders(apiKey));
-                log.info(PROCESSED_CHUNK_FROM, chunkNumber, size);
-                return null;
-            };
-            tasks.add(task);
+            EntityListRequest<CreditMemoRequest> customerRequestEntityListRequest = new EntityListRequest<>();
+            customerRequestEntityListRequest.setItems(currentPartition);
+            String url = this.apiUrl + "/credit-memo?transaction_id=" + transactionId;
+            httpClient.postForLocation(url, customerRequestEntityListRequest, buildAuthenticationHeaders(apiKey));
+            log.info(PROCESSED_CHUNK_FROM, chunkNumber, size);
         }
-        processAllTasks(tasks);
     }
 
     @Override
@@ -231,20 +199,14 @@ public final class ApiService implements IntegrationService {
         int i = 0;
         int size = lists.size();
         log.info("Adjustments chunks size -  {}, total size - {}", size, adjustmentRequests.size());
-        List<Callable<Void>> tasks = new ArrayList<>(size);
         for (List<AdjustmentRequest> currentPartition : lists) {
             final int chunkNumber = ++i;
-            Callable<Void> task = () -> {
-                EntityListRequest<AdjustmentRequest> customerRequestEntityListRequest = new EntityListRequest<>();
-                customerRequestEntityListRequest.setItems(currentPartition);
-                String url = this.apiUrl + "/adjustments?transaction_id=" + transactionId;
-                httpClient.postForLocation(url, customerRequestEntityListRequest, buildAuthenticationHeaders(apiKey));
-                log.info(PROCESSED_CHUNK_FROM, chunkNumber, size);
-                return null;
-            };
-            tasks.add(task);
+            EntityListRequest<AdjustmentRequest> customerRequestEntityListRequest = new EntityListRequest<>();
+            customerRequestEntityListRequest.setItems(currentPartition);
+            String url = this.apiUrl + "/adjustments?transaction_id=" + transactionId;
+            httpClient.postForLocation(url, customerRequestEntityListRequest, buildAuthenticationHeaders(apiKey));
+            log.info(PROCESSED_CHUNK_FROM, chunkNumber, size);
         }
-        processAllTasks(tasks);
     }
 
     @Override
@@ -256,20 +218,14 @@ public final class ApiService implements IntegrationService {
         int i = 0;
         int size = lists.size();
         log.info("External companies chunks size: {}", size);
-        List<Callable<Void>> tasks = new ArrayList<>(size);
         for (List<ExternalCompanyRequest> currentPartition : lists) {
             final int chunkNumber = ++i;
-            Callable<Void> task = () -> {
-                EntityListRequest<ExternalCompanyRequest> externalCompanyRequestEntityListRequest = new EntityListRequest<>();
-                externalCompanyRequestEntityListRequest.setItems(currentPartition);
-                String url = this.apiUrl + "/external-companies?transaction_id=" + transactionId;
-                httpClient.postForLocation(url, externalCompanyRequestEntityListRequest, buildAuthenticationHeaders(apiKey));
-                log.info(PROCESSED_CHUNK_FROM, chunkNumber, size);
-                return null;
-            };
-            tasks.add(task);
+            EntityListRequest<ExternalCompanyRequest> externalCompanyRequestEntityListRequest = new EntityListRequest<>();
+            externalCompanyRequestEntityListRequest.setItems(currentPartition);
+            String url = this.apiUrl + "/external-companies?transaction_id=" + transactionId;
+            httpClient.postForLocation(url, externalCompanyRequestEntityListRequest, buildAuthenticationHeaders(apiKey));
+            log.info(PROCESSED_CHUNK_FROM, chunkNumber, size);
         }
-        processAllTasks(tasks);
 
     }
 
@@ -281,20 +237,14 @@ public final class ApiService implements IntegrationService {
         int i = 0;
         int size = lists.size();
         log.info("External contacts chunks size: {}", size);
-        List<Callable<Void>> tasks = new ArrayList<>(size);
         for (List<ExternalContactRequest> currentPartition : lists) {
             final int chunkNumber = ++i;
-            Callable<Void> task = () -> {
-                EntityListRequest<ExternalContactRequest> externalContactRequestEntityListRequest = new EntityListRequest<>();
-                externalContactRequestEntityListRequest.setItems(currentPartition);
-                String url = this.apiUrl + "/external-contacts?transaction_id=" + transactionId;
-                httpClient.postForLocation(url, externalContactRequestEntityListRequest, buildAuthenticationHeaders(apiKey));
-                log.info(PROCESSED_CHUNK_FROM, chunkNumber, size);
-                return null;
-            };
-            tasks.add(task);
+            EntityListRequest<ExternalContactRequest> externalContactRequestEntityListRequest = new EntityListRequest<>();
+            externalContactRequestEntityListRequest.setItems(currentPartition);
+            String url = this.apiUrl + "/external-contacts?transaction_id=" + transactionId;
+            httpClient.postForLocation(url, externalContactRequestEntityListRequest, buildAuthenticationHeaders(apiKey));
+            log.info(PROCESSED_CHUNK_FROM, chunkNumber, size);
         }
-        processAllTasks(tasks);
     }
 
 
@@ -304,20 +254,14 @@ public final class ApiService implements IntegrationService {
         int i = 0;
         int size = lists.size();
         log.info("Sales chunks size: {}", size);
-        List<Callable<Void>> tasks = new ArrayList<>(size);
         for (List<SalesRequest> currentPartition : lists) {
             final int chunkNumber = ++i;
-            Callable<Void> task = () -> {
-                EntityListRequest<SalesRequest> salesRequestEntityListRequest = new EntityListRequest<>();
-                salesRequestEntityListRequest.setItems(currentPartition);
-                String url = this.apiUrl + "/sales?transaction_id=" + transactionId;
-                httpClient.postForLocation(url, salesRequestEntityListRequest, buildAuthenticationHeaders(apiKey));
-                log.info(PROCESSED_CHUNK_FROM, chunkNumber, size);
-                return null;
-            };
-            tasks.add(task);
+            EntityListRequest<SalesRequest> salesRequestEntityListRequest = new EntityListRequest<>();
+            salesRequestEntityListRequest.setItems(currentPartition);
+            String url = this.apiUrl + "/sales?transaction_id=" + transactionId;
+            httpClient.postForLocation(url, salesRequestEntityListRequest, buildAuthenticationHeaders(apiKey));
+            log.info(PROCESSED_CHUNK_FROM, chunkNumber, size);
         }
-        processAllTasks(tasks);
     }
 
     @Override
@@ -326,20 +270,14 @@ public final class ApiService implements IntegrationService {
         int i = 0;
         int size = lists.size();
         log.info("Currencies chunks size: {}", size);
-        List<Callable<Void>> tasks = new ArrayList<>(size);
         for (List<CurrencyRequest> currentPartition : lists) {
             final int chunkNumber = ++i;
-            Callable<Void> task = () -> {
-                EntityListRequest<CurrencyRequest> customerRequestEntityListRequest = new EntityListRequest<>();
-                customerRequestEntityListRequest.setItems(currentPartition);
-                String url = this.apiUrl + "/currencies?transaction_id=" + transactionId;
-                httpClient.postForLocation(url, customerRequestEntityListRequest, buildAuthenticationHeaders(apiKey));
-                log.info(PROCESSED_CHUNK_FROM, chunkNumber, size);
-                return null;
-            };
-            tasks.add(task);
+            EntityListRequest<CurrencyRequest> customerRequestEntityListRequest = new EntityListRequest<>();
+            customerRequestEntityListRequest.setItems(currentPartition);
+            String url = this.apiUrl + "/currencies?transaction_id=" + transactionId;
+            httpClient.postForLocation(url, customerRequestEntityListRequest, buildAuthenticationHeaders(apiKey));
+            log.info(PROCESSED_CHUNK_FROM, chunkNumber, size);
         }
-        processAllTasks(tasks);
     }
 
     @Override
@@ -348,20 +286,14 @@ public final class ApiService implements IntegrationService {
         int i = 0;
         int size = lists.size();
         log.info("Contents chunks size: {}", size);
-        List<Callable<Void>> tasks = new ArrayList<>(size);
         for (List<ContentRequest> currentPartition : lists) {
             final int chunkNumber = ++i;
-            Callable<Void> task = () -> {
-                EntityListRequest<ContentRequest> customerRequestEntityListRequest = new EntityListRequest<>();
-                customerRequestEntityListRequest.setItems(currentPartition);
-                String url = buildContentUrl(transactionId);
-                httpClient.postForLocation(url, customerRequestEntityListRequest, buildAuthenticationHeaders(apiKey));
-                log.info(PROCESSED_CHUNK_FROM, chunkNumber, size);
-                return null;
-            };
-            tasks.add(task);
+            EntityListRequest<ContentRequest> customerRequestEntityListRequest = new EntityListRequest<>();
+            customerRequestEntityListRequest.setItems(currentPartition);
+            String url = buildContentUrl(transactionId);
+            httpClient.postForLocation(url, customerRequestEntityListRequest, buildAuthenticationHeaders(apiKey));
+            log.info(PROCESSED_CHUNK_FROM, chunkNumber, size);
         }
-        processAllTasks(tasks);
     }
 
     @Override
@@ -387,66 +319,57 @@ public final class ApiService implements IntegrationService {
     }
 
     @Override
-    public void deleteCustomers(List<DeleteEntity> deletedDtos, Long transactionId, String apiKey) throws ExecutionException, InterruptedException {
+    public void deleteCustomers(List<DeleteEntity> deletedDtos, Long transactionId, String apiKey) {
         deleteEntity(deletedDtos, transactionId, apiKey, getUrlPrefx(SyncEntity.CUSTOMERS));
     }
 
     @Override
-    public Set<String> deleteInvoices(List<DeleteEntity> deletedDtos, Long transactionId, String apiKey) throws ExecutionException, InterruptedException {
+    public Set<String> deleteInvoices(List<DeleteEntity> deletedDtos, Long transactionId, String apiKey) {
         return deleteEntity(deletedDtos, transactionId, apiKey, getUrlPrefx(SyncEntity.INVOICES));
     }
 
     @Override
-    public Set<String> deletePayments(List<DeleteEntity> deletedDtos, Long transactionId, String apiKey) throws ExecutionException, InterruptedException {
+    public Set<String> deletePayments(List<DeleteEntity> deletedDtos, Long transactionId, String apiKey) {
         return deleteEntity(deletedDtos, transactionId, apiKey, getUrlPrefx(SyncEntity.PAYMENTS));
     }
 
     @Override
-    public Set<String> deleteCreditMemos(List<DeleteEntity> deletedDtos, Long transactionId, String apiKey) throws ExecutionException, InterruptedException {
+    public Set<String> deleteCreditMemos(List<DeleteEntity> deletedDtos, Long transactionId, String apiKey) {
         return deleteEntity(deletedDtos, transactionId, apiKey, getUrlPrefx(SyncEntity.CM));
     }
 
     @Override
-    public Set<String> deleteAdjustments(List<DeleteEntity> deletedDtos, Long transactionId, String apiKey) throws ExecutionException, InterruptedException {
+    public Set<String> deleteAdjustments(List<DeleteEntity> deletedDtos, Long transactionId, String apiKey) {
         return deleteEntity(deletedDtos, transactionId, apiKey, getUrlPrefx(SyncEntity.ADJUSTMENTS));
     }
 
     @Override
-    public Set<String> deleteContacts(List<DeleteEntity> deletedDtos, Long transactionId, String apiKey) throws ExecutionException, InterruptedException {
+    public Set<String> deleteContacts(List<DeleteEntity> deletedDtos, Long transactionId, String apiKey) {
         return deleteEntity(deletedDtos, transactionId, apiKey, getUrlPrefx(SyncEntity.CONTACTS));
     }
 
-    private Set<String> deleteEntity(List<DeleteEntity> deletedDtos, Long transactionId, String apiKey, String urlPrefix) throws ExecutionException, InterruptedException {
+    private Set<String> deleteEntity(List<DeleteEntity> deletedDtos, Long transactionId, String apiKey, String urlPrefix) {
         List<List<DeleteEntity>> lists = partition(deletedDtos, CHUNK_SIZE);
         int i = 0;
         int size = lists.size();
         log.info("Entity size: {}", size);
-        List<Callable<Set<String>>> tasks = new ArrayList<>(size);
+        Set<String> result = new HashSet<>();
         for (List<DeleteEntity> currentPartition : lists) {
             final int chunkNumber = ++i;
-            Callable<Set<String>> task = () -> {
-                DeleteEntityRequest deleteRequest = new DeleteEntityRequest();
-                deleteRequest.setDeletedEntities(currentPartition);
-                String url = this.apiUrl + "/" + urlPrefix + "/delete?transaction_id=" + transactionId;
-                String[] response = httpClient.post(url, deleteRequest, String[].class, buildAuthenticationHeaders(apiKey));
-                log.info(PROCESSED_CHUNK_FROM, chunkNumber, size);
-                return response != null ? new HashSet<>(Arrays.asList(response)) : new HashSet<>();
-            };
-            tasks.add(task);
-        }
-        List<Future<Set<String>>> futures = apiExecutorService.invokeAll(tasks);
-        Set<String> result = new HashSet<>();
-        for (Future<Set<String>> item : futures) {
-            Set<String> resultOfTask = item.get();
-            if (!isEmpty(resultOfTask)) {
-                result.addAll(resultOfTask);
+            DeleteEntityRequest deleteRequest = new DeleteEntityRequest();
+            deleteRequest.setDeletedEntities(currentPartition);
+            String url = this.apiUrl + "/" + urlPrefix + "/delete?transaction_id=" + transactionId;
+            String[] response = httpClient.post(url, deleteRequest, String[].class, buildAuthenticationHeaders(apiKey));
+            log.info(PROCESSED_CHUNK_FROM, chunkNumber, size);
+            if (response != null) {
+                result.addAll(Arrays.asList(response));
             }
         }
         return result;
     }
 
     @Override
-    public Set<String> deleteEntity(SyncEntity syncEntityType, List<DeleteEntity> deleteEntities, Long transactionId, String apiKey) throws ExecutionException, InterruptedException {
+    public Set<String> deleteEntity(SyncEntity syncEntityType, List<DeleteEntity> deleteEntities, Long transactionId, String apiKey) {
         return deleteEntity(deleteEntities, transactionId, apiKey, getUrlPrefx(syncEntityType));
     }
 
@@ -490,12 +413,5 @@ public final class ApiService implements IntegrationService {
         map.put(API_KEY_HEADER, apiKey);
         map.put(AUTHORIZATION_HEADER, this.authorizationToken);
         return map;
-    }
-
-    private void processAllTasks(List<Callable<Void>> tasks) throws InterruptedException, ExecutionException {
-        List<Future<Void>> futures = apiExecutorService.invokeAll(tasks);
-        for (Future<Void> item : futures) {
-            item.get();
-        }
     }
 }

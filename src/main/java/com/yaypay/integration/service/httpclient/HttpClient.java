@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import static org.apache.commons.collections4.MapUtils.isEmpty;
 import static org.apache.http.HttpHeaders.ACCEPT;
@@ -39,10 +40,19 @@ import static org.apache.http.HttpHeaders.CONTENT_TYPE;
 
 public class HttpClient {
     private static final Logger logger = LoggerFactory.getLogger(HttpClient.class);
+    private static final int MAX_CONNECTIONS = 10;
+    private static final int MAX_CONNECTION_TIME_TO_LIVE_MINUTES = 30;
+
     private final ObjectMapper objectMapper;
+    private final CloseableHttpClient client;
 
     public HttpClient() {
         this.objectMapper = ObjectMapperBuilder.integrationObjectMapper();
+        this.client = HttpClientBuilder
+                .create()
+                .setMaxConnTotal(MAX_CONNECTIONS)
+                .setConnectionTimeToLive(MAX_CONNECTION_TIME_TO_LIVE_MINUTES, TimeUnit.MINUTES)
+                .build();
     }
 
     public <T> T get(String url, Class<T> resultClass) {
@@ -101,10 +111,8 @@ public class HttpClient {
 
     private <T> T makeCall(String url, Class<T> resultClass, HttpUriRequest request, Map<String, String> additionalHeaders) {
         fillHeaders(request, additionalHeaders);
-
-        CloseableHttpClient client = HttpClientBuilder.create().build();
-        try {
-            HttpResponse response = client.execute(request);
+        try (CloseableHttpClient cl = client) {
+            HttpResponse response = cl.execute(request);
             verifyStatus(url, response);
             return objectMapper.readValue(response.getEntity().getContent(), resultClass);
         } catch (IOException e) {
@@ -116,10 +124,8 @@ public class HttpClient {
 
     private void makeCallForLocation(String url, HttpUriRequest request, Map<String, String> additionalHeaders) {
         fillHeaders(request, additionalHeaders);
-
-        CloseableHttpClient client = HttpClientBuilder.create().build();
-        try {
-            HttpResponse response = client.execute(request);
+        try (CloseableHttpClient cl = client) {
+            HttpResponse response = cl.execute(request);
             verifyStatus(url, response);
         } catch (IOException e) {
             String message = String.format("Error during call %s", url);
