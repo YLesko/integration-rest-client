@@ -1,5 +1,6 @@
 package com.yaypay.integration.service.api;
 
+import com.yaypay.api.dto.account.AccountRequest;
 import com.yaypay.api.dto.adjustment.AdjustmentRequest;
 import com.yaypay.api.dto.contact.ContactRequest;
 import com.yaypay.api.dto.content.ContentRequest;
@@ -13,11 +14,11 @@ import com.yaypay.api.dto.customer.CustomerResponse;
 import com.yaypay.api.dto.external_company.ExternalCompanyRequest;
 import com.yaypay.api.dto.external_contact.ExternalContactRequest;
 import com.yaypay.api.dto.invoice.InvoiceRequest;
+import com.yaypay.api.dto.log.LoggingMessage;
 import com.yaypay.api.dto.log.SyncEntity;
 import com.yaypay.api.dto.payment.PaymentRequest;
 import com.yaypay.api.dto.sales.SalesRequest;
 import com.yaypay.api.dto.transaction.UploadTransactionDTO;
-import com.yaypay.exception.SyncEntityUnknownException;
 import com.yaypay.integration.service.httpclient.HttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +37,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 
+import static com.yaypay.integration.util.UrlUtil.getUrlPrefx;
 import static com.yaypay.util.DateFormatUtil.dateToIso8601UtcString;
 import static java.util.concurrent.Executors.newFixedThreadPool;
 import static org.apache.commons.collections4.ListUtils.partition;
@@ -58,7 +60,6 @@ public final class ApiService implements IntegrationService {
     private static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String PROCESSED_CHUNK_FROM = "Processed chunk {} from {}";
 
-    private final ExecutorService apiExecutorService = newFixedThreadPool(Runtime.getRuntime().availableProcessors() + 1);
     private final HttpClient httpClient;
     private final String apiUrl;
     private final String authorizationToken;
@@ -108,6 +109,34 @@ public final class ApiService implements IntegrationService {
         String url = calculateUrlForSync("/invoices/open", bizId);
         String[] invoices = httpClient.get(url, String[].class, buildAuthenticationHeaders(apiKey));
         return Arrays.asList(invoices);
+    }
+
+    @Override
+    public List<String> getOpenInvoiceWithoutContentIds(Integer bizId, String apiKey) {
+        String url = calculateUrlForSync("/invoices/open_without_content", bizId);
+        String[] invoices = httpClient.get(url, String[].class, buildAuthenticationHeaders(apiKey));
+        return Arrays.asList(invoices);
+    }
+
+    @Override
+    public List<String> getInvoiceWithIncorrectPaidSum(Integer bizId, String apiKey) {
+        String url = calculateUrlForSync("/invoices/open_with_incorrect_paid", bizId);
+        String[] invoices = httpClient.get(url, String[].class, buildAuthenticationHeaders(apiKey));
+        return Arrays.asList(invoices);
+    }
+
+    @Override
+    public List<String> getOpenAdjustmentsIds(Integer bizId, String apiKey) {
+        String url = calculateUrlForSync("/adjustments/open", bizId);
+        String[] adjustments = httpClient.get(url, String[].class, buildAuthenticationHeaders(apiKey));
+        return Arrays.asList(adjustments);
+    }
+
+    @Override
+    public List<String> getOpenPaymentsIds(Integer bizId, String apiKey) {
+        String url = calculateUrlForSync("/payments/open", bizId);
+        String[] payments = httpClient.get(url, String[].class, buildAuthenticationHeaders(apiKey));
+        return Arrays.asList(payments);
     }
 
     @Override
@@ -247,6 +276,22 @@ public final class ApiService implements IntegrationService {
         }
     }
 
+    public void createOrUpdateAccounts(Long transactionId, List<AccountRequest> accountRequest, String apiKey) throws InterruptedException, ExecutionException {
+        List<List<AccountRequest>> lists = partition(accountRequest, CHUNK_SIZE);
+        int i = 0;
+        int size = lists.size();
+        log.info("Accounts chunks size: {}", size);
+        List<Callable<Void>> tasks = new ArrayList<>(size);
+        for (List<AccountRequest> currentPartition : lists) {
+            final int chunkNumber = ++i;
+            EntityListRequest<AccountRequest> accountRequestEntityListRequest = new EntityListRequest<>();
+            accountRequestEntityListRequest.setItems(currentPartition);
+            String url = this.apiUrl + "/accounts?transaction_id=" + transactionId;
+            httpClient.postForLocation(url, accountRequestEntityListRequest, buildAuthenticationHeaders(apiKey));
+            log.info(PROCESSED_CHUNK_FROM, chunkNumber, size);
+        }
+    }
+
 
     @Override
     public void createOrUpdateSales(Long transactionId, List<SalesRequest> salesRequests, String apiKey) throws InterruptedException, ExecutionException {
@@ -381,31 +426,18 @@ public final class ApiService implements IntegrationService {
         return entities != null ? Arrays.asList(entities) : Collections.emptyList();
     }
 
+    @Override
+    public void sendLoggingMessage(String apiKey, Long transactionId, LoggingMessage loggingMessage) {
+        String url = this.apiUrl + "/messages?transaction_id=" + transactionId;
+        httpClient.postForLocation(url, loggingMessage, buildAuthenticationHeaders(apiKey));
+    }
+
     private String calculateUrlForSync(String url, Integer bizId) {
         String requestUrl = this.apiUrl + url;
         if (bizId != null) {
             requestUrl = requestUrl + "?bizId=" + bizId;
         }
         return requestUrl;
-    }
-
-    private String getUrlPrefx(SyncEntity syncEntityType) {
-        switch (syncEntityType) {
-            case CUSTOMERS:
-                return "customers";
-            case INVOICES:
-                return "invoices";
-            case PAYMENTS:
-                return "payments";
-            case CM:
-                return "credit-memo";
-            case ADJUSTMENTS:
-                return "adjustments";
-            case CONTACTS:
-                return "contacts";
-            default:
-                throw new SyncEntityUnknownException("Unknown SyncEntity enum type: " + syncEntityType.toString());
-        }
     }
 
     private Map<String, String> buildAuthenticationHeaders(String apiKey) {

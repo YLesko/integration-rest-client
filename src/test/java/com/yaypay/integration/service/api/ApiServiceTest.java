@@ -14,13 +14,13 @@ import com.yaypay.api.dto.customer.CustomerResponse;
 import com.yaypay.api.dto.external_company.ExternalCompanyRequest;
 import com.yaypay.api.dto.external_contact.ExternalContactRequest;
 import com.yaypay.api.dto.invoice.InvoiceRequest;
+import com.yaypay.api.dto.log.LoggingMessage;
 import com.yaypay.api.dto.log.SyncEntity;
 import com.yaypay.api.dto.payment.PaymentRequest;
 import com.yaypay.api.dto.sales.SalesRequest;
 import com.yaypay.api.dto.transaction.UploadTransactionDTO;
 import com.yaypay.integration.service.httpclient.HttpClient;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -67,21 +67,24 @@ public class ApiServiceTest {
     private ArgumentCaptor<EntityListRequest> entityListRequestCaptor;
     @Captor
     private ArgumentCaptor<DeleteEntityRequest> deleteEntityRequestArgumentCaptor;
+    @Mock
+    private LoggingMessage loggingMessage;
 
     @Before
     public void setUp() throws Exception {
+        System.setProperty("user.timezone", "UTC");
         this.apiService = new ApiService(API_URL, "", httpClient);
     }
 
-    @Ignore
-    @Test
-    public void startTransaction() {
-        String expectedUrl = "http://localhost/batch/start?start_period=1969-12-31T22:00:00+00:00&end_period=2017-12-31T22:00:00+00:00&source_system=NET_SUITE&is_regular=false";
-        when(httpClient.post(urlCaptor.capture(), eq(null), eq(UploadTransactionDTO.class), anyMap())).thenReturn(UploadTransactionDTO.builder().id(TRANSACTION_ID).build());
-        Long transaction = apiService.startTransaction(API_KEY, getStartDate(), getEndDate(), SOURCE_SYSTEM_TYPE, true);
-        assertEquals(TRANSACTION_ID, transaction);
-        assertEquals(expectedUrl, urlCaptor.getValue());
-    }
+//    @Test
+//    public void startTransaction() {
+//        //FIXME dates of the test is dependant on local time
+//        String expectedUrl = "http://localhost/batch/start?start_period=1969-12-31T22:00:00+00:00&end_period=2017-12-31T22:00:00+00:00&source_system=NET_SUITE&is_regular=false";
+//        when(httpClient.post(urlCaptor.capture(), eq(null), eq(UploadTransactionDTO.class), anyMap())).thenReturn(UploadTransactionDTO.builder().id(TRANSACTION_ID).build());
+//        Long transaction = apiService.startTransaction(API_KEY, getStartDate(), getEndDate(), SOURCE_SYSTEM_TYPE, true);
+//        assertEquals(TRANSACTION_ID, transaction);
+//        assertEquals(expectedUrl, urlCaptor.getValue());
+//    }
 
 
     @Test
@@ -362,6 +365,14 @@ public class ApiServiceTest {
         List<String> activeEntityIds = apiService.getActiveEntityIds(SyncEntity.CM, BIZ_ID, API_KEY, SOURCE_SYSTEM_TYPE);
         assertEquals(expectedId, urlCaptor.getValue());
         assertEquals(activeEntityIds.get(0), SOME_ID);
+    }
+
+    @Test
+    public void testMessages() {
+        String expectedUrl = "http://localhost/messages?transaction_id=" + TRANSACTION_ID;
+        apiService.sendLoggingMessage(API_KEY, TRANSACTION_ID, loggingMessage);
+
+        verify(httpClient, times(1)).postForLocation(eq(expectedUrl), eq(loggingMessage), anyMap());
     }
 
     private Date getStartDate() {

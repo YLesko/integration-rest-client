@@ -1,5 +1,6 @@
 package com.yaypay.integration.service.api;
 
+import com.yaypay.api.dto.account.AccountRequest;
 import com.yaypay.api.dto.adjustment.AdjustmentRequest;
 import com.yaypay.api.dto.contact.ContactRequest;
 import com.yaypay.api.dto.content.ContentRequest;
@@ -11,6 +12,7 @@ import com.yaypay.api.dto.customer.CustomerResponse;
 import com.yaypay.api.dto.external_company.ExternalCompanyRequest;
 import com.yaypay.api.dto.external_contact.ExternalContactRequest;
 import com.yaypay.api.dto.invoice.InvoiceRequest;
+import com.yaypay.api.dto.log.LoggingMessage;
 import com.yaypay.api.dto.log.SyncEntity;
 import com.yaypay.api.dto.payment.PaymentRequest;
 import com.yaypay.api.dto.sales.SalesRequest;
@@ -39,6 +41,14 @@ public interface IntegrationService {
     void finishTransaction(Long transactionId, String apiKey, boolean isHistorical);
 
     List<String> getOpenInvoiceIds(Integer bizId, String apiKey);
+
+    List<String> getOpenInvoiceWithoutContentIds(Integer bizId, String apiKey);
+
+    List<String> getInvoiceWithIncorrectPaidSum(Integer bizId, String apiKey);
+
+    List<String> getOpenAdjustmentsIds(Integer bizId, String apiKey);
+
+    List<String> getOpenPaymentsIds(Integer bizId, String apiKey);
 
     void createOrUpdateInvoices(Long transactionId, List<InvoiceRequest> invoiceRequests, String apiKey) throws InterruptedException, ExecutionException;
 
@@ -70,6 +80,8 @@ public interface IntegrationService {
 
     void createOrUpdateContent(Long transactionId, ContentRequest contentRequests, String apiKey);
 
+    void createOrUpdateAccounts(Long transactionId, List<AccountRequest> contentRequests, String apiKey) throws InterruptedException, ExecutionException;
+
     Collection<CustomerResponse> getCustomers(Integer bizId, String apiKey, String sourceSystemType, boolean withOpenBalancesOnly);
 
     void deleteCustomers(List<DeleteEntity> deletedDtos, Long transactionId, String apiKey) throws ExecutionException, InterruptedException;
@@ -87,4 +99,6 @@ public interface IntegrationService {
     Set<String> deleteEntity(SyncEntity syncEntityType, List<DeleteEntity> deleteEntities, Long transactionId, String apiKey) throws ExecutionException, InterruptedException;
 
     List<String> getActiveEntityIds(SyncEntity syncEntityType, Integer bizId, String apiKey, String sourceSystemType);
+
+    void sendLoggingMessage(String apiKey, Long transactionId, LoggingMessage loggingMessage);
 }
