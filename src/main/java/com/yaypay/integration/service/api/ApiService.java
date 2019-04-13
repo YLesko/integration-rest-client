@@ -23,6 +23,7 @@ import com.yaypay.integration.service.httpclient.HttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -35,11 +36,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
 
 import static com.yaypay.integration.util.UrlUtil.getUrlPrefx;
 import static com.yaypay.util.DateFormatUtil.dateToIso8601UtcString;
-import static java.util.concurrent.Executors.newFixedThreadPool;
 import static org.apache.commons.collections4.ListUtils.partition;
 
 /*************************************************************************
@@ -445,5 +444,10 @@ public final class ApiService implements IntegrationService {
         map.put(API_KEY_HEADER, apiKey);
         map.put(AUTHORIZATION_HEADER, this.authorizationToken);
         return map;
+    }
+
+    @Override
+    public void close() throws IOException {
+        httpClient.close();
     }
 }
