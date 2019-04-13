@@ -33,7 +33,8 @@ import java.util.concurrent.ExecutionException;
  * Author : <a href="mailto:elesko@yaypay.com">Egor Lesko</a>
  * Date Created: 8/23/18 10:53
  */
-public interface IntegrationService {
+public interface IntegrationService extends AutoCloseable {
+
     Long startTransaction(String apiKey, Date startPeriod, Date endPeriod, String sourceSystemType, boolean transactionIsIrregular);
 
     void finishTransaction(Long transactionId, String apiKey);

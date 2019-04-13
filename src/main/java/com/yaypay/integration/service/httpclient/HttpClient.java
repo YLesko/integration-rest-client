@@ -6,6 +6,8 @@ import com.yaypay.exception.HttpClientNotSuccessStatusException;
 import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -14,6 +16,7 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,12 +41,33 @@ import static org.apache.http.HttpHeaders.CONTENT_TYPE;
  * Date Created: 7/25/2018 17:49
  */
 
-public class HttpClient {
+public class HttpClient implements AutoCloseable {
     private static final Logger logger = LoggerFactory.getLogger(HttpClient.class);
     private final ObjectMapper objectMapper;
+    private final CloseableHttpClient client;
 
     public HttpClient() {
         this.objectMapper = ObjectMapperBuilder.integrationObjectMapper();
+        this.client = configureHttpClient();
+    }
+
+    private CloseableHttpClient configureHttpClient() {
+        PoolingHttpClientConnectionManager connManager = new PoolingHttpClientConnectionManager();
+        connManager.setMaxTotal(10);
+        connManager.setDefaultMaxPerRoute(10);
+        connManager.closeIdleConnections(5, TimeUnit.SECONDS);
+        connManager.closeExpiredConnections();
+
+        RequestConfig requestConfig = RequestConfig.custom()
+                .setSocketTimeout((int) TimeUnit.MINUTES.toMillis(30))
+                .setConnectTimeout((int) TimeUnit.MINUTES.toMillis(30))
+                .setConnectionRequestTimeout((int) TimeUnit.MINUTES.toMillis(30))
+                .build();
+        return HttpClientBuilder
+                .create()
+                .setConnectionManager(connManager)
+                .setDefaultRequestConfig(requestConfig)
+                .build();
     }
 
     public <T> T get(String url, Class<T> resultClass) {
@@ -102,11 +126,7 @@ public class HttpClient {
 
     private <T> T makeCall(String url, Class<T> resultClass, HttpUriRequest request, Map<String, String> additionalHeaders) {
         fillHeaders(request, additionalHeaders);
-        try (CloseableHttpClient client = HttpClientBuilder
-                .create()
-                .setMaxConnTotal(1)
-                .setConnectionTimeToLive(30, TimeUnit.MINUTES).build()) {
-            HttpResponse response = client.execute(request);
+        try (CloseableHttpResponse response = client.execute(request)) {
             verifyStatus(url, response);
             return objectMapper.readValue(response.getEntity().getContent(), resultClass);
         } catch (IOException e) {
@@ -118,11 +138,7 @@ public class HttpClient {
 
     private void makeCallForLocation(String url, HttpUriRequest request, Map<String, String> additionalHeaders) {
         fillHeaders(request, additionalHeaders);
-        try (CloseableHttpClient client = HttpClientBuilder
-                .create()
-                .setMaxConnTotal(1)
-                .setConnectionTimeToLive(30, TimeUnit.MINUTES).build()) {
-            HttpResponse response = client.execute(request);
+        try (CloseableHttpResponse response = client.execute(request)) {
             verifyStatus(url, response);
         } catch (IOException e) {
             String message = String.format("Error during call %s", url);
@@ -156,5 +172,9 @@ public class HttpClient {
                 request.addHeader(stringStringEntry.getKey(), stringStringEntry.getValue());
             }
         }
+    }
+    @Override
+    public void close() throws IOException {
+        client.close();
     }
 }
