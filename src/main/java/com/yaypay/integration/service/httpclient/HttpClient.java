@@ -173,7 +173,6 @@ public class HttpClient implements AutoCloseable {
             }
         }
     }
-
     @Override
     public void close() throws IOException {
         client.close();
