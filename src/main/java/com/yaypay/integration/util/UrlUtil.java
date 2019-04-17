@@ -25,6 +25,8 @@ public class UrlUtil {
         switch (syncEntityType) {
             case CUSTOMERS:
                 return "customers";
+            case ACCOUNTS:
+                return "accounts";
             case INVOICES:
                 return "invoices";
             case PAYMENTS:
