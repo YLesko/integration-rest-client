@@ -59,8 +59,8 @@ public class HttpClient implements AutoCloseable {
         connManager.closeExpiredConnections();
 
         RequestConfig requestConfig = RequestConfig.custom()
-                .setSocketTimeout((int) TimeUnit.MINUTES.toMillis(30))
-                .setConnectTimeout((int) TimeUnit.MINUTES.toMillis(30))
+                .setSocketTimeout((int) TimeUnit.MINUTES.toMillis(90))
+                .setConnectTimeout((int) TimeUnit.MINUTES.toMillis(90))
                 .setConnectionRequestTimeout((int) TimeUnit.MINUTES.toMillis(30))
                 .build();
         return HttpClientBuilder
