@@ -1,5 +1,6 @@
 package com.yaypay.integration.service.api;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yaypay.api.dto.adjustment.AdjustmentRequest;
 import com.yaypay.api.dto.contact.ContactRequest;
 import com.yaypay.api.dto.content.ContentRequest;
@@ -15,12 +16,14 @@ import com.yaypay.api.dto.external_company.ExternalCompanyRequest;
 import com.yaypay.api.dto.external_contact.ExternalContactRequest;
 import com.yaypay.api.dto.invoice.InvoiceRequest;
 import com.yaypay.api.dto.log.LoggingMessage;
+import com.yaypay.api.dto.log.LoggingMessageFull;
 import com.yaypay.api.dto.log.SyncEntity;
+import com.yaypay.api.dto.page.LoggingMessageResponse;
 import com.yaypay.api.dto.payment.PaymentRequest;
 import com.yaypay.api.dto.sales.SalesRequest;
-import com.yaypay.api.dto.transaction.UploadTransactionDTO;
 import com.yaypay.integration.service.httpclient.HttpClient;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -28,6 +31,7 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -40,6 +44,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.eq;
@@ -373,6 +378,32 @@ public class ApiServiceTest {
         apiService.sendLoggingMessage(API_KEY, TRANSACTION_ID, loggingMessage);
 
         verify(httpClient, times(1)).postForLocation(eq(expectedUrl), eq(loggingMessage), anyMap());
+    }
+
+    @Test
+    public void testGetLoggingMessages() throws IOException {
+        LoggingMessageResponse messageResponse = new LoggingMessageResponse();
+        LoggingMessageFull message = new LoggingMessageFull();
+        String successMessage = "success";
+        message.setText(successMessage);
+        messageResponse.setContent(Collections.singletonList(message));
+        when(httpClient.get(eq("http://localhost/messages/transactions?transactionIds=123&page=0&size=10"), any(Class.class), anyMap())).thenReturn(messageResponse);
+
+        LoggingMessageResponse messages = apiService.getLoggingMessagesByTransactionIds(API_KEY, Collections.singletonList(TRANSACTION_ID), 0, 10);
+        assertNotNull(messages);
+        assertEquals(successMessage, messages.getContent().get(0).getText());
+    }
+
+    @Ignore
+    @Test
+    public void realTest() {
+        ApiService apiService = new ApiService("http://localhost:9090", "");
+        ArrayList<Long> transactionIds = new ArrayList<>();
+        transactionIds.add(3284L);
+        transactionIds.add(3283L);
+
+        LoggingMessageResponse response = apiService.getLoggingMessagesByTransactionIds("378355ad4d318d1f7ceecec1a52d3d7d", transactionIds, 0, 10);
+        assertNotNull(response);
     }
 
     private Date getStartDate() {

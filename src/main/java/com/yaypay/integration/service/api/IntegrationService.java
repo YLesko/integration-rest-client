@@ -14,6 +14,7 @@ import com.yaypay.api.dto.external_contact.ExternalContactRequest;
 import com.yaypay.api.dto.invoice.InvoiceRequest;
 import com.yaypay.api.dto.log.LoggingMessage;
 import com.yaypay.api.dto.log.SyncEntity;
+import com.yaypay.api.dto.page.LoggingMessageResponse;
 import com.yaypay.api.dto.payment.PaymentRequest;
 import com.yaypay.api.dto.sales.SalesRequest;
 
@@ -102,4 +103,6 @@ public interface IntegrationService extends AutoCloseable {
     List<String> getActiveEntityIds(SyncEntity syncEntityType, Integer bizId, String apiKey, String sourceSystemType);
 
     void sendLoggingMessage(String apiKey, Long transactionId, LoggingMessage loggingMessage);
+
+    LoggingMessageResponse getLoggingMessagesByTransactionIds(String apiKey, List<Long> transactionIds, int page, int size);
 }
