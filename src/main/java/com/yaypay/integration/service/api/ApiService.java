@@ -15,7 +15,9 @@ import com.yaypay.api.dto.external_company.ExternalCompanyRequest;
 import com.yaypay.api.dto.external_contact.ExternalContactRequest;
 import com.yaypay.api.dto.invoice.InvoiceRequest;
 import com.yaypay.api.dto.log.LoggingMessage;
+import com.yaypay.api.dto.log.LoggingMessageFull;
 import com.yaypay.api.dto.log.SyncEntity;
+import com.yaypay.api.dto.page.LoggingMessageResponse;
 import com.yaypay.api.dto.payment.PaymentRequest;
 import com.yaypay.api.dto.sales.SalesRequest;
 import com.yaypay.api.dto.transaction.UploadTransactionDTO;
@@ -33,9 +35,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 import static com.yaypay.integration.util.UrlUtil.getUrlPrefx;
 import static com.yaypay.util.DateFormatUtil.dateToIso8601UtcString;
@@ -58,6 +62,7 @@ public final class ApiService implements IntegrationService {
     private static final String API_KEY_HEADER = "ApiKey";
     private static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String PROCESSED_CHUNK_FROM = "Processed chunk {} from {}";
+    private static final String COMMA_DELIMITER = ",";
 
     private final HttpClient httpClient;
     private final String apiUrl;
@@ -429,6 +434,16 @@ public final class ApiService implements IntegrationService {
     public void sendLoggingMessage(String apiKey, Long transactionId, LoggingMessage loggingMessage) {
         String url = this.apiUrl + "/messages?transaction_id=" + transactionId;
         httpClient.postForLocation(url, loggingMessage, buildAuthenticationHeaders(apiKey));
+    }
+
+    @Override
+    public LoggingMessageResponse getLoggingMessagesByTransactionIds(String apiKey, List<Long> transactionIds, int page, int size) {
+        String url = this.apiUrl + String.format("/messages/transactions?transactionIds=%s&page=%s&size=%s", toLine(transactionIds), page, size);
+        return httpClient.get(url, LoggingMessageResponse.class, buildAuthenticationHeaders(apiKey));
+    }
+
+    private String toLine(List<Long> transactionIds) {
+        return transactionIds.stream().map(Objects::toString).collect(Collectors.joining(COMMA_DELIMITER));
     }
 
     private String calculateUrlForSync(String url, Integer bizId) {
