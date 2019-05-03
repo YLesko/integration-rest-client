@@ -25,9 +25,10 @@ public class Payment {
     private BigDecimal appliedAmount;
     private List<PaymentItem> applyList;
     private String referenceNumber;
+    private String externalId;
 
-    @java.beans.ConstructorProperties({"customer", "paymentDate", "amount", "channel", "exchangeRate", "currency", "appliedAmount", "applyList", "referenceNumber"})
-    Payment(Integration customer, String paymentDate, BigDecimal amount, String channel, BigDecimal exchangeRate, String currency, BigDecimal appliedAmount, List<PaymentItem> applyList, String referenceNumber) {
+    @java.beans.ConstructorProperties({"customer", "paymentDate", "amount", "channel", "exchangeRate", "currency", "appliedAmount", "applyList", "referenceNumber", "externalId"})
+    Payment(Integration customer, String paymentDate, BigDecimal amount, String channel, BigDecimal exchangeRate, String currency, BigDecimal appliedAmount, List<PaymentItem> applyList, String referenceNumber, String externalId) {
         this.customer = customer;
         this.paymentDate = paymentDate;
         this.amount = amount;
@@ -37,6 +38,7 @@ public class Payment {
         this.appliedAmount = appliedAmount;
         this.applyList = applyList;
         this.referenceNumber = referenceNumber;
+        this.externalId = externalId;
     }
 
     public static PaymentBuilder builder() {
@@ -79,6 +81,10 @@ public class Payment {
         return this.referenceNumber;
     }
 
+    public String getExternalId() {
+        return externalId;
+    }
+
     public static class PaymentBuilder {
         private Integration customer;
         private String paymentDate;
@@ -89,6 +95,7 @@ public class Payment {
         private BigDecimal appliedAmount;
         private List<PaymentItem> applyList;
         private String referenceNumber;
+        private String externalId;
 
         PaymentBuilder() {
         }
@@ -138,12 +145,17 @@ public class Payment {
             return this;
         }
 
+        public PaymentBuilder externalId(String externalId) {
+            this.externalId = externalId;
+            return this;
+        }
+
         public Payment build() {
-            return new Payment(customer, paymentDate, amount, channel, exchangeRate, currency, appliedAmount, applyList, referenceNumber);
+            return new Payment(customer, paymentDate, amount, channel, exchangeRate, currency, appliedAmount, applyList, referenceNumber, externalId);
         }
 
         public String toString() {
-            return "Payment.PaymentBuilder(customer=" + this.customer + ", paymentDate=" + this.paymentDate + ", amount=" + this.amount + ", channel=" + this.channel + ", exchangeRate=" + this.exchangeRate + ", currency=" + this.currency + ", appliedAmount=" + this.appliedAmount + ", applyList=" + this.applyList + ", referenceNumber=" + this.referenceNumber + ")";
+            return "Payment.PaymentBuilder(customer=" + this.customer + ", paymentDate=" + this.paymentDate + ", amount=" + this.amount + ", channel=" + this.channel + ", exchangeRate=" + this.exchangeRate + ", currency=" + this.currency + ", appliedAmount=" + this.appliedAmount + ", applyList=" + this.applyList + ", referenceNumber=" + this.referenceNumber + ", externalId=" + this.externalId + ")";
         }
     }
 }
